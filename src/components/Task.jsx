@@ -1,23 +1,24 @@
 export const Task = ({
   id,
   title,
-  completed,
   deleteTaskFunc,
   toggleDoneTaskFunc,
+  completed,
 }) => {
   const deleteBtnOnClick = () => {
     deleteTaskFunc(id);
   };
-
   const doneBtnOnClick = () => {
     toggleDoneTaskFunc(id);
   };
 
   return (
     <div className="d-flex p-3 gap-2 align-items-center border-bottom">
-      <span className={completed ? "text-decoration-line-through" : ""}>
-        {title}
-      </span>
+      {completed ? (
+        <span className="text-decoration-line-through">{title}</span>
+      ) : (
+        <span>{title}</span>
+      )}
       <button className="btn btn-success" onClick={doneBtnOnClick}>
         Done
       </button>
