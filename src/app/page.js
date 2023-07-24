@@ -64,7 +64,7 @@ export default function Home() {
           />
         ))}
       </div>
-      <Footer year="2023" fullName="Noppol NUnpiang" studentId="650612086" />
+      <Footer year="2023" fullName="Noppol Nunpiang" studentId="650612086" />
     </div>
   );
 }
