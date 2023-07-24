@@ -1,46 +1,70 @@
 "use client";
 
-import axios from "axios";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { Task } from "@/components/Task";
+import { TaskInput } from "@/components/TaskInput";
+import { nanoid } from "nanoid";
 import { useState } from "react";
 
-export default function RandomUserPage() {
-  //user = null or array of object
-  const [users, setUsers] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [genAmount, setGenAmount] = useState(1);
+export default function Home() {
+  const [tasks, setTasks] = useState([]);
+  const [count1, setCount1] = useState(0);
+  const [count2, setCount2] = useState(0);
 
-  const generateBtnOnClick = async () => {
-    setIsLoading(true);
-    const resp = await axios.get(
-      `https://randomuser.me/api/?results=${genAmount}`
-    );
-    setIsLoading(false);
-    const users = resp.data.results;
-    //Your code here
-    //Process result from api response with map function. Tips use function from /src/libs/cleanUser
-    //Then update state with function : setUsers(...)
+  const addTask = (newTaskTitle) => {
+    const newTask = { id: nanoid(), title: newTaskTitle, completed: false };
+    const newTasks = [...tasks, newTask];
+    setCount1(count1 + 1);
+    setTasks(newTasks);
+  };
+
+  const deleteTask = (taskId) => {
+    const taskToDelete = tasks.find((task) => task.id === taskId);
+    if (taskToDelete && taskToDelete.completed) {
+      setCount2(Math.max(count2 - 1, 0));
+    }
+
+    const newTasks = tasks.filter((task) => task.id !== taskId);
+    setCount1(count1 - 1);
+    setTasks(newTasks);
+  };
+
+  const toggleDoneTask = (taskId) => {
+    const newTasks = structuredClone(tasks);
+
+    const task = newTasks.find((x) => x.id === taskId);
+    const isTaskCompleted = task.completed;
+    task.completed = !task.completed;
+    setTasks(newTasks);
+
+    if (task.completed && !isTaskCompleted) {
+      setCount2(count2 + 1);
+    } else if (!task.completed && isTaskCompleted) {
+      setCount2(Math.max(count2 - 1, 0));
+    }
   };
 
   return (
-    <div style={{ maxWidth: "700px" }} className="mx-auto">
-      <p className="display-4 text-center fst-italic m-4">Users Generator</p>
-      <div className="d-flex justify-content-center align-items-center fs-5 gap-2">
-        Number of User(s)
-        <input
-          className="form-control text-center"
-          style={{ maxWidth: "100px" }}
-          type="number"
-          onChange={(e) => setGenAmount(e.target.value)}
-          value={genAmount}
-        />
-        <button className="btn btn-dark" onClick={generateBtnOnClick}>
-          Generate
-        </button>
+    <div className="container mx-auto">
+      <Header />
+      <div style={{ maxWidth: "400px" }} className="mx-auto">
+        <p className="text-center text-secondary fst-italic">
+          All ({count1}) Done ({count2})
+        </p>
+        <TaskInput addTaskFunc={addTask} />
+        {tasks.map((task) => (
+          <Task
+            id={task.id}
+            title={task.title}
+            deleteTaskFunc={deleteTask}
+            toggleDoneTaskFunc={toggleDoneTask}
+            completed={task.completed}
+            key={task.id}
+          />
+        ))}
       </div>
-      {isLoading && (
-        <p className="display-6 text-center fst-italic my-4">Loading ...</p>
-      )}
-      {users && !isLoading && users.map(/*code map rendering UserCard here */)}
+      <Footer year="2023" fullName="Noppol NUnpiang" studentId="650612086" />
     </div>
   );
 }
